@@ -89,7 +89,7 @@ type details = {
 *)
   ?request: request option;
   ?response: response option;   
-  user: user
+  ?user: user option
 }
 
 type entry = {
