@@ -1,18 +1,19 @@
 .PHONY: all install-deps clean
 
 # Config
-PACKAGES := atdgen extunix ssl lwt cohttp
+PACKAGES := atdgen calendar extunix ssl lwt cohttp
 SUBDIRS := src
 ATDGEN := atdgen
 OCAMLFIND := ocamlfind
 OCAMLOPT := $(OCAMLFIND) ocamlopt
 OCAMLDEP := $(OCAMLFIND) ocamldep
-OCAMLFLAGS := -g -package atdgen -package extunix -package cohttp.lwt $(SUBDIRS:%=-I %)
+OCAMLFLAGS := -g -package atdgen -package calendar -package extunix -package cohttp.lwt $(SUBDIRS:%=-I %)
 x := cmx
 i := cmi
 V := @
 
-SOURCES := src/raygun_t.mli src/raygun_t.ml \
+SOURCES := src/raygun_date.mli src/raygun_date.ml \
+           src/raygun_t.mli src/raygun_t.ml \
            src/raygun_j.mli src/raygun_j.ml \
            src/raygun.mli src/raygun.ml
 
@@ -26,11 +27,11 @@ install-deps:
 	$(V)$(OCAMLDEP) $(SUBDIRS:%=-I %) $(^) > $(@)
 
 src/raygun_t.mli src/raygun_t.ml: src/raygun.atd
-	$(V)echo ATDGEN -t rc/raygun.atd
+	$(V)echo ATDGEN -t src/raygun.atd
 	$(V)$(ATDGEN) -t src/raygun.atd
 
 src/raygun_j.mli src/raygun_j.ml: src/raygun.atd
-	$(V)echo ATDGEN -j rc/raygun.atd
+	$(V)echo ATDGEN -j src/raygun.atd
 	$(V)$(ATDGEN) -j src/raygun.atd
 
 %.$(i): %.mli

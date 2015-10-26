@@ -54,14 +54,14 @@ type environment = {
 }
 
 type request = {
-  hostName: string;
-  url: string;
-  httpMethod: string;
-  iPAddress: string;
-  queryString: (string*string) list;
-  form: (string*string) list;
-  headers: (string*string) list;
-  rawData: string;
+  ?hostName: string option;
+  ?url: string option;
+  ?httpMethod: string option;
+  ?iPAddress: string option;
+  ?queryString: (string*string) list option;
+  ?form: (string*string) list option;
+  ?headers: (string*string) list option;
+  ?rawData: string option;
 }
 
 type response = {
@@ -93,6 +93,6 @@ type details = {
 }
 
 type entry = {
-  occurredOn: string;
+  occurredOn: string wrap <ocaml module="Raygun_date">;
   details: details
 }
