@@ -1,18 +1,18 @@
 .PHONY: all install-deps clean
 
 # Config
-PACKAGES := atdgen calendar extunix ssl lwt cohttp
+PACKAGES := atdgen ISO8601 extunix ssl lwt cohttp
 SUBDIRS := src
 ATDGEN := atdgen
 OCAMLFIND := ocamlfind
 OCAMLOPT := $(OCAMLFIND) ocamlopt
 OCAMLDEP := $(OCAMLFIND) ocamldep
-OCAMLFLAGS := -g -package atdgen -package calendar -package extunix -package cohttp.lwt $(SUBDIRS:%=-I %)
+OCAMLFLAGS := -g -package atdgen -package ISO8601 -package extunix -package cohttp.lwt $(SUBDIRS:%=-I %)
 x := cmx
 i := cmi
 V := @
 
-SOURCES := src/raygun_date.mli src/raygun_date.ml \
+SOURCES := src/raygun_time.mli src/raygun_time.ml \
            src/raygun_t.mli src/raygun_t.ml \
            src/raygun_j.mli src/raygun_j.ml \
            src/raygun.mli src/raygun.ml

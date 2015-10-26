@@ -14,9 +14,7 @@ type stacktrace_entry = {
 
 type error = {
   ?innerError: error option;
-(* TODO
-  ?data: 'a;
-*)
+  ?data: (string*string) list <json repr="object"> option;
   className: string;
   message: string;
   stackTrace: stacktrace_entry list
@@ -60,7 +58,7 @@ type request = {
   ?iPAddress: string option;
   ?queryString: (string*string) list option;
   ?form: (string*string) list option;
-  ?headers: (string*string) list option;
+  ?headers: (string*string) list <json repr="object"> option;
   ?rawData: string option;
 }
 
@@ -84,15 +82,13 @@ type details = {
   error: error;  
   environment: environment;
   tags: string list;
-(* TODO
-  ?userCustomData: 'b option; 
-*)
+  ?userCustomData: (string*string) list <json repr="object"> option; 
   ?request: request option;
   ?response: response option;   
   ?user: user option
 }
 
 type entry = {
-  occurredOn: string wrap <ocaml module="Raygun_date">;
+  occurredOn: string wrap <ocaml module="Raygun_time">;
   details: details
 }
