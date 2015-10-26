@@ -1,0 +1,98 @@
+type client = {
+  name: string;
+  version: string;
+  clientUrl: string
+}
+
+type stacktrace_entry = {
+  lineNumber: int;
+  className: string;
+  columnNumber: int;
+  fileName: string;
+  methodName: string
+}
+
+type error = {
+  ?innerError: error option;
+(* TODO
+  ?data: 'a;
+*)
+  className: string;
+  message: string;
+  stackTrace: stacktrace_entry list
+}
+
+type environment = {
+  ?processorCount: int option;
+  ?osVersion: string option;
+  ?windowBoundsWidth: int option;
+  ?windowBoundsHeight: int option;
+  ?browser_Width <json name="browser-Width">: int option;
+  ?browser_Height <json name="browser-Height">: int option;
+  ?screen_Width <json name="screen-Width">: int option;
+  ?screen_Height <json name="screen-Height">: int option;
+  ?resolutionScale: float option;
+  ?color_Depth <json name="color-Depth">: int option;
+  ?currentOrientation: string option;
+  ?cpu: string option;
+  ?packageVersion: string option;
+  ?architecture: string option;
+  ?deviceManufacturer: string option;
+  ?model: string option;
+  ?totalPhysicalMemory: float option;
+  ?availablePhysicalMemory: float option;
+  ?totalVirtualMemory: float option;
+  ?availableVirtualMemory: float option;
+  ?diskSpaceFree: float list option;
+  ?deviceName: string option;
+  ?locale: string option;
+  ?utcOffset: string option;
+  ?browser: string option;
+  ?browserName: string option;
+  ?browser_Version <json name="browser-Version">: string option;
+  platform: string
+}
+
+type request = {
+  hostName: string;
+  url: string;
+  httpMethod: string;
+  iPAddress: string;
+  queryString: (string*string) list;
+  form: (string*string) list;
+  headers: (string*string) list;
+  rawData: string;
+}
+
+type response = {
+  statusCode: int;
+}
+
+type user = {
+  identifier: string;
+  isAnonymous: bool;
+  email: string;
+  fullName: string;
+  firstName: string;
+  uuid: string;
+}
+
+type details = {
+  ?machineName: string option;
+  ?version: string option;
+  client: client;
+  error: error;  
+  environment: environment;
+  tags: string list;
+(* TODO
+  ?userCustomData: 'b option; 
+*)
+  ?request: request option;
+  ?response: response option;   
+  user: user
+}
+
+type entry = {
+  occurredOn: string;
+  details: details
+}

@@ -1,0 +1,7 @@
+.*sw*
+*.cm*
+*.o
+*.log
+.depend
+.DS_Store
+raygun_*.ml*
