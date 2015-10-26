@@ -1,3 +1,6 @@
+let () = 
+  Printexc.record_backtrace true
+
 let client = {
   Raygun_t.
     name = "raygun4ocaml";
