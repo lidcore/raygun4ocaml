@@ -1,0 +1,42 @@
+OASISFormat: 0.4
+Name:        raygun4ocaml
+Version:     0.1.0
+Synopsis:    Client for the Raygun error reporting API
+Description: Track errors and crashes in real-time 
+  in your OCaml programs using the Raygun API.
+
+Authors:     Romain Beauxis
+Maintainers: Lidcore <it@lidcore.com>
+Homepage:    https://github.com/lidcore/raygun4ocaml
+License:     ISC
+Plugins:     META (0.4)
+BuildTools:  ocamlbuild
+
+Library raygun
+  Path:            lib
+  Findlibname:     raygun
+  Pack:            true
+  Modules:         Time, Raygun_t, Stacktrace,
+                   Api
+  InternalModules: Raygun_j 
+  BuildDepends:    ISO8601, atdgen (>= 1.5.0)
+  XMETARequires:   ISO8601, atdgen
+
+Flag lwt
+  Description: build the Lwt library
+  Default$:    false
+
+Library raygun_lwt
+  Build$:        flag(lwt)
+  Install$:      flag(lwt)
+  Path:          lwt
+  Findlibname:   lwt
+  FindlibParent: raygun
+  BuildDepends:  cohttp.lwt, raygun
+  XMETARequires: cohttp.lwt, raygun
+  Modules:       Raygun_lwt
+
+SourceRepository master
+  Type:     git
+  Location: https://github.com/lidcore/raygun4ocaml
+  Browser:  https://github.com/lidcore/raygun4ocaml

@@ -15,5 +15,5 @@ sig
   val report_uncaught_exceptions : ?refine:(Raygun_t.entry -> Raygun_t.entry) -> api_key:string -> unit
 end
 
-module Api : functor (Http:Http_t) ->
+module Make : functor (Http:Http_t) ->
   Api_t with type t = Http.t

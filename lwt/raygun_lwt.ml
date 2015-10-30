@@ -20,4 +20,6 @@ struct
       th >>= fun (_) -> return_unit)
 end
 
-module Api = Raygun.Api(Http)
+module Api = Raygun.Api.Make(Http)
+
+include Api

@@ -1,4 +1,3 @@
-open Lwt
 open Raygun_t
 
 let client = {
@@ -59,7 +58,7 @@ sig
   val report_uncaught_exceptions : ?refine:(Raygun_t.entry -> Raygun_t.entry) -> api_key:string -> unit
 end
 
-module Api(Http:Http_t) =
+module Make(Http:Http_t) =
 struct
   type t = Http.t
 
@@ -76,7 +75,7 @@ struct
 
   let error_handler ?(refine=fun x -> x) ~api_key exn bt =
     let stackTrace =
-      Some (Raygun_stacktrace.of_backtrace bt)
+      Some (Stacktrace.of_backtrace bt)
     in
     let message =  
       Some (Printexc.to_string exn)
@@ -98,7 +97,7 @@ struct
       user = None
     } in
     let entry = refine {
-      occurredOn = Raygun_time.now ();
+      occurredOn = Time.now ();
       details = details 
     } in
     Http.async (post_entry ~api_key entry)

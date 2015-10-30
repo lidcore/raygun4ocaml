@@ -90,6 +90,6 @@ type details = {
 }
 
 type entry = {
-  occurredOn: string wrap <ocaml module="Raygun_time">;
+  occurredOn: string wrap <ocaml module="Time">;
   details: details
 }

@@ -1,53 +1,57 @@
-.PHONY: all install-deps clean
+PKG_NAME = $(shell oasis query name)
+DIR = $(PKG_NAME)-$(shell oasis query version)
+PKG_TARBALL = $(DIR).tar.gz
 
-# Config
-PACKAGES := atdgen ISO8601 ssl lwt cohttp
-SUBDIRS := src
-ATDGEN := atdgen
-OCAMLFIND := ocamlfind
-OCAMLOPT := $(OCAMLFIND) ocamlopt
-OCAMLDEP := $(OCAMLFIND) ocamldep
-OCAMLFLAGS := -g -package atdgen -package ISO8601 -package extunix -package cohttp.lwt $(SUBDIRS:%=-I %)
-x := cmx
-i := cmi
-V := @
+DISTFILES = _oasis _opam setup.ml _tags \
+  $(wildcard $(addprefix lib/, *.ml *.mli *.atd)) \
+  $(wildcard $(addprefix lwt/, *.ml *.mli *.atd))
 
-SOURCES := src/raygun_time.mli src/raygun_time.ml \
-           src/raygun_t.mli src/raygun_t.ml \
-           src/raygun_j.mli src/raygun_j.ml \
-           src/raygun_stacktrace.mli src/raygun_stacktrace.ml \
-           src/raygun.mli src/raygun.ml \
-           src/raygun_lwt.mli src/raygun_lwt.ml
 
-all: $(SOURCES:.ml=.$(x))
+ATDGEN = lib/raygun_j.ml lib/raygun_j.mli lib/raygun_t.ml lib/raygun_t.mli
 
-install-deps:
-	opam install $(PACKAGES)
+default: all opam/opam
 
-.depend: $(SOURCES)
-	$(V)echo OCAMLDEP
-	$(V)$(OCAMLDEP) $(SUBDIRS:%=-I %) $(^) > $(@)
+all byte native setup.log: setup.data
+	ocaml setup.ml -build
 
-src/raygun_t.mli src/raygun_t.ml: src/raygun.atd
-	$(V)echo ATDGEN -t src/raygun.atd
-	$(V)$(ATDGEN) -t src/raygun.atd
+configure: setup.data
+setup.data: setup.ml
+	ocaml setup.ml -configure --enable-lwt
 
-src/raygun_j.mli src/raygun_j.ml: src/raygun.atd
-	$(V)echo ATDGEN -j src/raygun.atd
-	$(V)$(ATDGEN) -j src/raygun.atd
+setup.ml: _oasis $(ATDGEN)
+	oasis setup -setup-update dynamic
+	touch $@
 
-%.$(i): %.mli
-	$(V)echo OCAMLOPT -c $(<)
-	$(V)$(OCAMLOPT) $(OCAMLFLAGS) -c $(<)
+$(ATDGEN): lib/raygun.atd
+	atdgen -j $<
+	atdgen -t $<
 
-%.$(x): %.ml
-	$(V)echo OCAMLOPT -c $(<)
-	$(V)$(OCAMLOPT) $(OCAMLFLAGS) -c $(<)
+doc install uninstall reinstall: setup.log
+	ocaml setup.ml -$@
+
+opam/opam: _oasis
+	oasis2opam --local -y
+
+.PHONY: dist tar
+dist tar: setup.ml
+	mkdir -p $(DIR)
+	for f in $(DISTFILES); do \
+	  cp -r --parents $$f $(DIR); \
+	done
+# Make a setup.ml independent of oasis:
+	cd $(DIR) && oasis setup
+	tar -zcvf $(PKG_TARBALL) $(DIR)
+	$(RM) -r $(DIR)
+
+
 
 clean:
-	rm -f .depend src/raygun_t.ml* src/raygun_j.ml*
-	find . -name '*.o' -exec rm \{\} \;	
-	find . -name '*.a' -exec rm \{\} \;
-	find . -name '*.cm*' -exec rm \{\} \;
+	ocaml setup.ml -clean
+	$(RM) $(ATDGEN) $(PKG_TARBALL)
 
--include .depend
+distclean:: clean
+	ocaml setup.ml -distclean
+	$(RM) $(wildcard *.ba[0-9] *.bak *~ *.odocl)
+
+.PHONY: configure all byte native doc install uninstall reinstall \
+	clean distclean

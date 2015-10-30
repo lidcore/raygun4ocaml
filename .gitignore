@@ -6,3 +6,17 @@
 .DS_Store
 raygun_t.ml*
 raygun_j.ml*
+_tags
+opam/
+myocamlbuild.ml
+setup.data
+setup.ml
+_build/
+lwt/raygun_lwt.mldylib
+lwt/raygun_lwt.mllib
+lib/META
+lib/raygun.mldylib
+lib/raygun.mllib
+lib/raygun.mlpack
+lib/raygun_lwt.mldylib
+lib/raygun_lwt.mllib
