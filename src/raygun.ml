@@ -7,32 +7,10 @@ let client = {
   clientUrl = "https://github.com/lidcore/raygun4ocaml"
 }
 
-let environment () =
+let environment =
   let platform = Sys.os_type in
-  let processorCount =
-    let f () =
-      try
-        let p =
-          Unix.open_process_in "sysctl -n hw.ncpu"
-        in
-        Some (int_of_string (input_line p))
-      with
-        | _ -> None
-    in
-    match platform with
-      | "Unix" -> f () 
-      | _ -> None
-  in
-  let extunix_try f =
-    try
-      Some (f ())
-    with ExtUnixAll.Not_available _ -> None
-  in
-  let osVersion =
-    extunix_try (fun () ->
-      let uname = ExtUnixAll.uname () in
-      uname.ExtUnixAll.Uname.release)
-  in
+  let processorCount = None in
+  let osVersion = None in
   let windowBoundsWidth = None in
   let windowBoundsHeight = None in
   let browser_Width = None in
@@ -67,56 +45,65 @@ let environment () =
      diskSpaceFree; deviceName; locale; utcOffset; browser; browserName;
      browser_Version }
 
-let post_entry ~api_key entry =
-  let url = "https://api.raygun.io/entries" in
-  let json = Raygun_j.string_of_entry entry in
-  let headers =
-    Cohttp.Header.add_list (Cohttp.Header.init ()) [
-      ("X-ApiKey", api_key);
-      ("Content-Type", "application/json");
-      ("Content-Length", string_of_int (String.length json))
-    ]
-  in
-  let uri = Uri.of_string url in
-  let body =
-    Cohttp_lwt_body.of_stream
-      (Lwt_stream.of_list [json])
-  in
-  Cohttp_lwt_unix.Client.post ~body ~headers uri
+module type Http_t =
+sig
+  type t
+  val post : headers:((string*string) list) -> body:string -> string -> t
+  val async : t -> unit
+end
 
-let error_handler ~api_key exn bt =
-  let stackTrace =
-    Some (Raygun_stacktrace.of_backtrace bt)
-  in
-  let message =  
-    Some (Printexc.to_string exn)
-  in
-  let error = {
-    message; stackTrace;
-    innerError = None;
-    data       = None;
-    className  = None
-  } in
-  let environment = environment () in
-  let details = {
-    client; error; environment;
-    machineName = None;
-    version = None;
-    tags = Some ["uncaught error"];
-    userCustomData = None;
-    request = None;
-    response = None;
-    user = None
-  } in
-  let entry = {
-    occurredOn = Raygun_time.now ();
-    details = details 
-  } in
-  let thread () = post_entry ~api_key entry >>= (fun (_,_) ->
-    return_unit)
-  in
-  Lwt.async thread
+module type Api_t =
+sig
+  type t
+  val post_entry : api_key:string -> Raygun_t.entry -> t
+  val report_uncaught_exceptions : ?refine:(Raygun_t.entry -> Raygun_t.entry) -> api_key:string -> unit
+end
 
-let report_uncaught_exceptions ~api_key =
-  Printexc.record_backtrace true;
-  Printexc.set_uncaught_exception_handler (error_handler ~api_key)
+module Api(Http:Http_t) =
+struct
+  type t = Http.t
+
+  let post_entry ~api_key entry =
+    let url = "https://api.raygun.io/entries" in
+    let body = Raygun_j.string_of_entry entry in
+    let headers = [
+        ("X-ApiKey", api_key);
+        ("Content-Type", "application/json");
+        ("Content-Length", string_of_int (String.length body))
+      ]
+    in
+    Http.post ~body ~headers url
+
+  let error_handler ?(refine=fun x -> x) ~api_key exn bt =
+    let stackTrace =
+      Some (Raygun_stacktrace.of_backtrace bt)
+    in
+    let message =  
+      Some (Printexc.to_string exn)
+    in
+    let error = {
+      message; stackTrace;
+      innerError = None;
+      data       = None;
+      className  = None
+    } in
+    let details = {
+      client; error; environment;
+      machineName = None;
+      version = None;
+      tags = Some ["uncaught error"];
+      userCustomData = None;
+      request = None;
+      response = None;
+      user = None
+    } in
+    let entry = refine {
+      occurredOn = Raygun_time.now ();
+      details = details 
+    } in
+    Http.async (post_entry ~api_key entry)
+
+  let report_uncaught_exceptions ?refine ~api_key =
+    Printexc.record_backtrace true;
+    Printexc.set_uncaught_exception_handler (error_handler ?refine ~api_key)
+end

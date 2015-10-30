@@ -1,7 +1,7 @@
 .PHONY: all install-deps clean
 
 # Config
-PACKAGES := atdgen ISO8601 extunix ssl lwt cohttp
+PACKAGES := atdgen ISO8601 ssl lwt cohttp
 SUBDIRS := src
 ATDGEN := atdgen
 OCAMLFIND := ocamlfind
@@ -16,7 +16,8 @@ SOURCES := src/raygun_time.mli src/raygun_time.ml \
            src/raygun_t.mli src/raygun_t.ml \
            src/raygun_j.mli src/raygun_j.ml \
            src/raygun_stacktrace.mli src/raygun_stacktrace.ml \
-           src/raygun.mli src/raygun.ml
+           src/raygun.mli src/raygun.ml \
+           src/raygun_lwt.mli src/raygun_lwt.ml
 
 all: $(SOURCES:.ml=.$(x))
 
