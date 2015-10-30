@@ -1,14 +1,13 @@
-let () = 
-  Printexc.record_backtrace true
+open Lwt
+open Raygun_t
 
 let client = {
-  Raygun_t.
-    name = "raygun4ocaml";
-    version = "0.1.0";
-    clientUrl = "https://github.com/lidcore/raygun4ocaml"
+  name = "raygun4ocaml";
+  version = "0.1.0";
+  clientUrl = "https://github.com/lidcore/raygun4ocaml"
 }
 
-let environment  () =
+let environment () =
   let platform = Sys.os_type in
   let processorCount =
     let f () =
@@ -59,7 +58,7 @@ let environment  () =
   let browser = None in
   let browserName = None in
   let browser_Version = None in
-  { Raygun_t.platform; processorCount; osVersion;
+  { platform; processorCount; osVersion;
      windowBoundsWidth; windowBoundsHeight;
      browser_Width; browser_Height; screen_Width; screen_Height;
      resolutionScale; color_Depth; currentOrientation; cpu; packageVersion;
@@ -84,3 +83,40 @@ let post_entry ~api_key entry =
       (Lwt_stream.of_list [json])
   in
   Cohttp_lwt_unix.Client.post ~body ~headers uri
+
+let error_handler ~api_key exn bt =
+  let stackTrace =
+    Some (Raygun_stacktrace.of_backtrace bt)
+  in
+  let message =  
+    Some (Printexc.to_string exn)
+  in
+  let error = {
+    message; stackTrace;
+    innerError = None;
+    data       = None;
+    className  = None
+  } in
+  let environment = environment () in
+  let details = {
+    client; error; environment;
+    machineName = None;
+    version = None;
+    tags = Some ["uncaught error"];
+    userCustomData = None;
+    request = None;
+    response = None;
+    user = None
+  } in
+  let entry = {
+    occurredOn = Raygun_time.now ();
+    details = details 
+  } in
+  let thread () = post_entry ~api_key entry >>= (fun (_,_) ->
+    return_unit)
+  in
+  Lwt.async thread
+
+let report_uncaught_exceptions ~api_key =
+  Printexc.record_backtrace true;
+  Printexc.set_uncaught_exception_handler (error_handler ~api_key)

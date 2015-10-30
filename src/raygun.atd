@@ -5,19 +5,20 @@ type client = {
 }
 
 type stacktrace_entry = {
-  lineNumber: int;
-  className: string;
-  columnNumber: int;
-  fileName: string;
-  methodName: string
+  ?lineNumber: int option;
+  ?className: string option;
+  ?fileName: string option;
+  ?methodName: string option
 }
+
+type stacktrace = stacktrace_entry list
 
 type error = {
   ?innerError: error option;
   ?data: (string*string) list <json repr="object"> option;
-  className: string;
-  message: string;
-  stackTrace: stacktrace_entry list
+  ?className: string option;
+  ?message: string option;
+  ?stackTrace: stacktrace option
 }
 
 type environment = {
@@ -67,12 +68,12 @@ type response = {
 }
 
 type user = {
-  identifier: string;
-  isAnonymous: bool;
-  email: string;
-  fullName: string;
-  firstName: string;
-  uuid: string;
+  ?identifier: string option;
+  ?isAnonymous: bool option;
+  ?email: string option;
+  ?fullName: string option;
+  ?firstName: string option;
+  ?uuid: string option;
 }
 
 type details = {
@@ -81,7 +82,7 @@ type details = {
   client: client;
   error: error;  
   environment: environment;
-  tags: string list;
+  ?tags: string list option;
   ?userCustomData: (string*string) list <json repr="object"> option; 
   ?request: request option;
   ?response: response option;   

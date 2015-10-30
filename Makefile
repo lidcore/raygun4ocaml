@@ -15,6 +15,7 @@ V := @
 SOURCES := src/raygun_time.mli src/raygun_time.ml \
            src/raygun_t.mli src/raygun_t.ml \
            src/raygun_j.mli src/raygun_j.ml \
+           src/raygun_stacktrace.mli src/raygun_stacktrace.ml \
            src/raygun.mli src/raygun.ml
 
 all: $(SOURCES:.ml=.$(x))
@@ -43,7 +44,7 @@ src/raygun_j.mli src/raygun_j.ml: src/raygun.atd
 	$(V)$(OCAMLOPT) $(OCAMLFLAGS) -c $(<)
 
 clean:
-	rm -f .depend src/raygun_*.ml*
+	rm -f .depend src/raygun_t.ml* src/raygun_j.ml*
 	find . -name '*.o' -exec rm \{\} \;	
 	find . -name '*.a' -exec rm \{\} \;
 	find . -name '*.cm*' -exec rm \{\} \;
