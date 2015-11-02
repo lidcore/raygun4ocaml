@@ -20,3 +20,5 @@ lib/raygun.mllib
 lib/raygun.mlpack
 lib/raygun_lwt.mldylib
 lib/raygun_lwt.mllib
+raygun4ocaml-0.1.0.tar.gz
+raygun4ocaml-0.1.0/

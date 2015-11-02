@@ -2,10 +2,7 @@ PKG_NAME = $(shell oasis query name)
 DIR = $(PKG_NAME)-$(shell oasis query version)
 PKG_TARBALL = $(DIR).tar.gz
 
-DISTFILES = _oasis _opam setup.ml _tags \
-  $(wildcard $(addprefix lib/, *.ml *.mli *.atd)) \
-  $(wildcard $(addprefix lwt/, *.ml *.mli *.atd))
-
+DISTFILES = _oasis setup.ml _tags lib lwt
 
 ATDGEN = lib/raygun_j.ml lib/raygun_j.mli lib/raygun_t.ml lib/raygun_t.mli
 
@@ -36,7 +33,7 @@ opam/opam: _oasis
 dist tar: setup.ml
 	mkdir -p $(DIR)
 	for f in $(DISTFILES); do \
-	  cp -r --parents $$f $(DIR); \
+	  cp -r $$f $(DIR); \
 	done
 # Make a setup.ml independent of oasis:
 	cd $(DIR) && oasis setup
