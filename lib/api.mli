@@ -12,6 +12,7 @@ module type Api_t =
 sig
   type t
   val post_entry : api_key:string -> Raygun_t.entry -> t
+  val report_exception : api_key:string -> exn -> Printexc.raw_backtrace -> unit
   val report_uncaught_exceptions : ?refine:(Raygun_t.entry -> Raygun_t.entry) -> api_key:string -> unit -> unit
 end
 
