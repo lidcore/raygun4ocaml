@@ -102,7 +102,7 @@ struct
     } in
     Http.async (post_entry ~api_key entry)
 
-  let report_uncaught_exceptions ?refine ~api_key =
+  let report_uncaught_exceptions ?refine ~api_key () =
     Printexc.record_backtrace true;
     Printexc.set_uncaught_exception_handler (error_handler ?refine ~api_key)
 end
