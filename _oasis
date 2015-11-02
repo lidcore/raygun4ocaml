@@ -32,8 +32,8 @@ Library raygun_lwt
   Path:          lwt
   Findlibname:   lwt
   FindlibParent: raygun
-  BuildDepends:  cohttp.lwt, raygun
-  XMETARequires: cohttp.lwt, raygun
+  BuildDepends:  lwt, cohttp.lwt, raygun
+  XMETARequires: lwt, cohttp.lwt, raygun
   Modules:       Raygun_lwt
 
 SourceRepository master
