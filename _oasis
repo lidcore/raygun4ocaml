@@ -19,8 +19,8 @@ Library raygun
   Modules:         Time, Raygun_t, Stacktrace,
                    Api
   InternalModules: Raygun_j 
-  BuildDepends:    ISO8601, atdgen (>= 1.5.0)
-  XMETARequires:   ISO8601, atdgen
+  BuildDepends:    unix, ISO8601, atdgen (>= 1.5.0)
+  XMETARequires:   unix, ISO8601, atdgen
 
 Flag lwt
   Description: build the Lwt library
